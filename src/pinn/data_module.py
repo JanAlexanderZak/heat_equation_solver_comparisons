@@ -1,5 +1,5 @@
-""" DataModule for the 1D heat equation.
-"""
+"""DataModule for the 1D heat equation."""
+
 import os
 
 from typing import Callable, List, Tuple
@@ -11,7 +11,7 @@ import torch
 
 
 class ConcatDatasets(torch.utils.data.Dataset):
-    """ ConcatDatasets joins different datasets (e.g. collocation points, IC, BC)
+    """ConcatDatasets joins different datasets (e.g. collocation points, IC, BC)
         into a tuple and provides the functionalities needed for training_step.
         Performance is better than dict-return of dataset.
 
@@ -22,6 +22,7 @@ class ConcatDatasets(torch.utils.data.Dataset):
         https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#ConcatDataset
         https://discuss.pytorch.org/t/how-does-concatdataset-work/60083
     """
+
     def __init__(self, *datasets) -> None:
         """
         Args:
@@ -31,18 +32,21 @@ class ConcatDatasets(torch.utils.data.Dataset):
         self.datasets = datasets
 
     def __getitem__(self, idx: int) -> Tuple[torch.utils.data.dataset.TensorDataset]:
-        """ Returns each dataset separately within a tuple for access in training_step.
+        """Returns each dataset separately within a tuple for access in training_step.
 
         Args:
             idx (int): batch idx
 
         Returns:
-            Tuple[torch.utils.data.dataset.TensorDataset]: Tuple of datasets to for training_step.
+            Tuple[torch.utils.data.dataset.TensorDataset]:
+                Tuple of datasets for training_step.
         """
         return tuple(self.datasets[0][i][idx] for i in range(len(self.datasets[0])))
 
     def __len__(self) -> int:
-        """ The total dataset length to determine batch per dataset e.g. 15000/512=30 steps
+        """Total dataset length to determine batch per dataset.
+
+        E.g. 15000/512=30 steps
 
         Returns:
             int: total dataset lentght
@@ -60,7 +64,7 @@ class HeatEq1DPINNDataModule(pl.LightningDataModule):
 
         self.save_hyperparameters(args.__dict__)
         self.save_hyperparameters("path_to_data")
-        
+
         self.dataset_train = None
         self.dataset_val = None
         self.dataset_test = None
@@ -81,14 +85,16 @@ class HeatEq1DPINNDataModule(pl.LightningDataModule):
             np.load(os.path.join(path_to_data, "y_train_IC.npy")),
             np.load(os.path.join(path_to_data, "X_star.npy")),
         )
-    
+
     def prepare_data(self) -> None:
         # https://github.com/Lightning-AI/lightning/issues/11528
         pass
 
     def setup(self) -> None:
         # Load, create dataset
-        x_train, _, x_train_BC, y_train_BC, x_train_IC, y_train_IC, X_star = self.load_data(self.hparams.path_to_data)
+        x_train, _, x_train_BC, y_train_BC, x_train_IC, y_train_IC, X_star = (
+            self.load_data(self.hparams.path_to_data)
+        )
 
         self.column_names = list(["x", "t"])
         self.target_names = list(["y"])
@@ -112,8 +118,8 @@ class HeatEq1DPINNDataModule(pl.LightningDataModule):
         self.dataset_test = torch.utils.data.TensorDataset(
             torch.Tensor(X_star),
         )
-       
-    def train_dataloader(self): 
+
+    def train_dataloader(self):
         return torch.utils.data.DataLoader(
             ConcatDatasets(
                 [
@@ -127,7 +133,7 @@ class HeatEq1DPINNDataModule(pl.LightningDataModule):
             persistent_workers=self.hparams.persistent_workers,
             shuffle=True,
         )
-    
+
     def val_dataloader(self):
         return torch.utils.data.DataLoader(
             ConcatDatasets(
@@ -145,16 +151,16 @@ class HeatEq1DPINNDataModule(pl.LightningDataModule):
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
             self.dataset_test,
-            #batch_size=self.hparams.batch_size,
+            # batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             persistent_workers=self.hparams.persistent_workers,
             shuffle=False,
         )
-    
+
     def predict_dataloader(self):
         return torch.utils.data.DataLoader(
             self.dataset_test,
-            #batch_size=self.hparams.batch_size,
+            # batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             persistent_workers=self.hparams.persistent_workers,
             shuffle=False,

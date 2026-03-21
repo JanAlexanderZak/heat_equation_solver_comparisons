@@ -10,10 +10,12 @@ from src.constants import X_DOMAIN, TIME_DOMAIN
 def main():
     X, T = np.meshgrid(X_DOMAIN, TIME_DOMAIN)
 
-    X_star = np.hstack((
-        X.flatten().reshape(-1, 1),
-        T.flatten().reshape(-1, 1),
-    ))
+    X_star = np.hstack(
+        (
+            X.flatten().reshape(-1, 1),
+            T.flatten().reshape(-1, 1),
+        )
+    )
 
     u_pred = torch.load(f"./src/pinn/data/predictions/predictions.pkl")
     u_pred = torch.tensor(u_pred).reshape(-1, 1)
@@ -29,7 +31,7 @@ def main():
     plt.legend(loc="upper right")
     plt.tight_layout()
     plt.savefig("./src/plots/pinn_solution.png", dpi=200)
-    #plt.show()
+    # plt.show()
     plt.close()
 
 

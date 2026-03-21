@@ -1,5 +1,5 @@
-""" Executable example of 1D heat equation in PyTorch Lightning.
-"""
+"""Executable example of 1D heat equation in PyTorch Lightning."""
+
 import pytorch_lightning as pl
 import torch
 
@@ -24,7 +24,8 @@ def main():
 
     hyper_parameters = {
         "activation_function": torch.nn.Tanh,
-        "layer_initialization": torch.nn.init.xavier_uniform_, #torch.nn.init.xavier_normal_
+        # Alternative: torch.nn.init.xavier_normal_
+        "layer_initialization": torch.nn.init.xavier_uniform_,
         "optimizer": torch.optim.Adam,
         "scheduler": torch.optim.lr_scheduler.ReduceLROnPlateau,
         "scheduler_patience": 100,
@@ -44,9 +45,9 @@ def main():
         args=args,
     )
     data_module.setup()
-    
+
     train_loader = data_module.train_dataloader()
-    #val_loader = data_module.val_dataloader()
+    # val_loader = data_module.val_dataloader()
     test_loader = data_module.test_dataloader()
 
     model = HeatEq1DPINNRegressor(
@@ -57,7 +58,7 @@ def main():
         target_names=data_module.target_names,
     )
     model.hparams.update(data_module.hparams)
-    
+
     trainer = pl.Trainer(
         max_epochs=args.max_epochs,
         sync_batchnorm=args.sync_batchnorm,
@@ -66,11 +67,14 @@ def main():
     print(dict(model.hparams))
 
     trainer.fit(
-        model=model, 
+        model=model,
         train_dataloaders=train_loader,
     )
 
-    u_pred = trainer.predict(model, dataloaders=test_loader,)       
+    u_pred = trainer.predict(
+        model,
+        dataloaders=test_loader,
+    )
     torch.save(u_pred, f"./src/pinn/data/predictions/predictions.pkl")
 
 

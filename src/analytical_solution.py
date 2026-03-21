@@ -22,5 +22,5 @@ if __name__ == "__main__":
     plt.legend(loc="upper right")
     plt.tight_layout()
     plt.savefig("src/plots/analytical_solution.png", dpi=200)
-    #plt.show()
+    # plt.show()
     plt.close()

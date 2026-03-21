@@ -1,6 +1,6 @@
 class DeepLearningArguments:
-    """ This class contains all deep learning arguments.
-    """
+    """This class contains all deep learning arguments."""
+
     def __init__(
         self,
         seed: float,

@@ -1,18 +1,22 @@
-""" Ordinary finite-differences approach for 1D heat equation.
-"""
+"""Ordinary finite-differences approach for 1D heat equation."""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from utils import Stepper, rhs_centered
 from constants import (
-    dx, X_DOMAIN, NUM_OF_SPATIAL_STEPS,
-    dt, TIME_STEPS, NUM_OF_TIME_STEPS,
-    ALPHA, HEAT_SOURCE_INTENSITY,
+    dx,
+    X_DOMAIN,
+    NUM_OF_SPATIAL_STEPS,
+    dt,
+    TIME_STEPS,
+    NUM_OF_TIME_STEPS,
+    ALPHA,
+    HEAT_SOURCE_INTENSITY,
 )
 
 
 if __name__ == "__main__":
-
     # * Initial condition
     T0 = np.zeros_like(X_DOMAIN)
     heat_source = HEAT_SOURCE_INTENSITY * np.sin(np.pi * X_DOMAIN)
@@ -34,5 +38,5 @@ if __name__ == "__main__":
     plt.legend(loc="upper right")
     plt.tight_layout()
     plt.savefig("src/plots/FDM_solution.png", dpi=200)
-    #plt.show()
+    # plt.show()
     plt.close()
